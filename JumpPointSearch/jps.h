@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include "grid.h"
+
 
 using std::vector;
 
@@ -51,7 +53,7 @@ class JumpPointSearch
 {
 
 public:
-	JumpPointSearch();
+	JumpPointSearch(int height, int width);
 	virtual ~JumpPointSearch();
 
 	void SetSrcY(int y) { srcY = y; }
@@ -64,9 +66,16 @@ public:
 	int GetDestY() { return destY; }
 	int GetDestX() { return destX; }
 
+	
+
 	void Run();
 
+	bool** closed;
+	int** open;
+
 protected:
+
+	void InitList();
 
 	bool CheckCornerR(Node* in, Node** out);
 	bool CheckCornerU(Node* in, Node** out);
@@ -82,13 +91,14 @@ protected:
 	bool CheckCornerL(int cur_y, int cur_x);
 	bool CheckCornerD(int cur_y, int cur_x);
 
-
 	int destY;
 	int destX;
 	int srcY;
 	int srcX;
 
-	const int WEIGHT = 8;
+	const int HEIGHT;
+	const int WIDTH;
+	const int WEIGHT = 10;
 
 };
 

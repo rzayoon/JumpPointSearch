@@ -7,8 +7,6 @@ Grid tile[GRID_HEIGHT][GRID_WIDTH];
 HWND hWnd;
 
 
-extern bool closed[GRID_HEIGHT][GRID_WIDTH];
-extern int open[GRID_HEIGHT][GRID_WIDTH];
 
 void InitGrid(HWND hwnd)
 {
@@ -17,12 +15,13 @@ void InitGrid(HWND hwnd)
 	for (int y = 0; y < GRID_HEIGHT; y++)
 	{
 		for (int x = 0; x < GRID_WIDTH; x++)
+		for (int x = 0; x < GRID_WIDTH; x++)
 		{
 			tile[y][x].type = Empty;
-			closed[y][x] = false;
-			open[y][x] = MAXINT32;
 		}
 	}
+
+
 
 
 
@@ -83,14 +82,14 @@ void Render()
 			int rectX = x * GRID_SIZE;
 
 			
-			if (open && open[y][x] < MAXINT32)
+			if (jps.open && jps.open[y][x] < MAXINT32)
 			{
 				SelectObject(hdc, openBrush);
 				Rectangle(hdc, rectX, rectY, rectX + GRID_SIZE, rectY + GRID_SIZE);
 
 			}
 			
-			if (closed && closed[y][x])
+			if (jps.closed && jps.closed[y][x])
 			{
 				SelectObject(hdc, closeBrush);
 				Rectangle(hdc, rectX, rectY, rectX + GRID_SIZE, rectY + GRID_SIZE);

@@ -35,7 +35,6 @@ int main()
 		WS_CAPTION |
 		WS_SYSMENU, CW_USEDEFAULT, 0, WIN_WIDTH, WIN_HEIGHT, NULL, (HMENU)NULL, hInst, NULL);
 	if (hWnd == NULL) return 1;
-
 	InitGrid(hWnd);
 
 	ShowWindow(hWnd, SW_SHOWNORMAL);
