@@ -70,7 +70,6 @@ void JumpPointSearch::Run()
 	InitList();
 
 	priority_queue<Node*, std::vector<Node*>, cmp> pq;
-	vector<Node*> delete_list;
 
 	Node* new_node = &openNode[srcY][srcX];
 	new_node->g = 0;
