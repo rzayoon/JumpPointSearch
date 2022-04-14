@@ -82,7 +82,7 @@ void Render()
 			int rectX = x * GRID_SIZE;
 
 			
-			if (jps.open && jps.open[y][x] < MAXINT32)
+			if (jps.openNode && jps.openNode[y][x].f < MAXINT32)
 			{
 				SelectObject(hdc, openBrush);
 				Rectangle(hdc, rectX, rectY, rectX + GRID_SIZE, rectY + GRID_SIZE);

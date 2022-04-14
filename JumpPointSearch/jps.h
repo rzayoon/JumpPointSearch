@@ -70,8 +70,11 @@ public:
 
 	void Run();
 
+	/// <summary>
+	///  출력 불필요하면 protected로
+	/// </summary>
 	bool** closed;
-	int** open;
+	Node** openNode;
 
 protected:
 

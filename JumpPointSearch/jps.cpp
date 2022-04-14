@@ -10,7 +10,6 @@ const int deltaX[] = { 0, -1, 0, 1, -1, -1, 1, 1 };
 
 const int cost[] = { 10, 10, 10, 10, 14, 14, 14, 14 };
 
-// 출력 없으면 함수 내부로
 
 
 vector<Pos> path;
@@ -23,13 +22,11 @@ JumpPointSearch::JumpPointSearch(int height, int width) : HEIGHT(height), WIDTH(
 	srcX = WIDTH / 3;
 
 	closed = new bool* [HEIGHT];
-	open = new int* [HEIGHT];
-
+	openNode = new Node * [HEIGHT];
 	for (int i = 0; i < HEIGHT; i++)
 	{
 		closed[i] = new bool[WIDTH];
-		open[i] = new int[WIDTH];
-
+		openNode[i] = new Node[WIDTH];
 	}
 
 	InitList();
@@ -40,11 +37,11 @@ JumpPointSearch::~JumpPointSearch()
 	for (int i = 0; i < HEIGHT; i++)
 	{
 		delete[] closed[i];
-		delete[] open[i];
+		delete[] openNode[i];
 
 	}
 	delete[] closed;
-	delete[] open;
+	delete[] openNode;
 }
 
 
@@ -59,7 +56,7 @@ void JumpPointSearch::InitList()
 		for (j = 0; j < WIDTH; j++)
 		{
 			closed[i][j] = false;
-			open[i][j] = MAXINT32;
+			openNode[i][j].f = MAXINT32;
 		}
 	}
 
@@ -75,7 +72,7 @@ void JumpPointSearch::Run()
 	priority_queue<Node*, std::vector<Node*>, cmp> pq;
 	vector<Node*> delete_list;
 
-	Node* new_node = new Node;
+	Node* new_node = &openNode[srcY][srcX];
 	new_node->g = 0;
 	new_node->f = WEIGHT * (abs(destY - srcY) + abs(destX - srcX));
 	new_node->y = srcY;
@@ -86,8 +83,6 @@ void JumpPointSearch::Run()
 	new_node->dir = DIR::None;
 
 	pq.push(new_node);
-	open[srcY][srcX] = new_node->f;
-	delete_list.push_back(new_node);
 
 	Node* cur_node = nullptr;
 
@@ -118,76 +113,64 @@ void JumpPointSearch::Run()
 			if (CheckCornerU(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->right_corner && CheckCornerUR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->left_corner && CheckCornerUL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			break;
 		case DIR::LL:
 			if (CheckCornerL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->right_corner && CheckCornerUL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->left_corner && CheckCornerDL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			break;
 		case DIR::DD:
 			if (CheckCornerD(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->right_corner && CheckCornerDL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->left_corner && CheckCornerDR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			break;
 		case DIR::RR:
 			if (CheckCornerR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->right_corner && CheckCornerDR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->left_corner && CheckCornerUR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			break;
@@ -195,56 +178,46 @@ void JumpPointSearch::Run()
 			if (CheckCornerUL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerU(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (cur_node->right_corner && CheckCornerUR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->left_corner && CheckCornerDL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			break;
 		case DIR::DL:
 			if (CheckCornerDL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerD(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (cur_node->right_corner && CheckCornerUL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->left_corner && CheckCornerDR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			break;
@@ -253,99 +226,81 @@ void JumpPointSearch::Run()
 			if (CheckCornerDR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerD(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (cur_node->right_corner && CheckCornerDL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->left_corner && CheckCornerUR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			break;
 		case DIR::UR:
 			if (CheckCornerUR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerU(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (cur_node->right_corner && CheckCornerDR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (cur_node->left_corner && CheckCornerUL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			break;
 		case DIR::None:
 			if (CheckCornerU(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 
 			if (CheckCornerUL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerDL(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerD(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerDR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			if (CheckCornerUR(cur_node, &node))
 			{
 				pq.push(node);
-				delete_list.push_back(node);
 			}
 			break;
 		}
@@ -369,15 +324,6 @@ void JumpPointSearch::Run()
 		}
 
 
-
-	while (!delete_list.empty())
-	{
-		cur_node = delete_list.back();
-		delete_list.pop_back();
-
-		delete cur_node;
-
-	}
 
 }
 
@@ -417,10 +363,10 @@ bool JumpPointSearch::CheckCornerR(Node* in, Node** out)
 			int g = in->g + cost[(int)DIR::RR] * abs(cur_x - in->x);
 			int h = WEIGHT * (abs(cur_x - destX) + abs(cur_y - destY));
 
-			if (open[cur_y][cur_x] < g + h) break;
-			open[cur_y][cur_x] = g + h;
+			if (openNode[cur_y][cur_x].f < g + h) break;
+			openNode[cur_y][cur_x].f = g + h;
 
-			*out = new Node;
+			*out = &openNode[cur_y][cur_x];
 			(*out)->x = cur_x;
 			(*out)->y = cur_y;
 			(*out)->left_corner = left_corner;
@@ -475,10 +421,10 @@ bool JumpPointSearch::CheckCornerL(Node* in, Node** out)
 			int g = in->g + cost[(int)DIR::LL] * abs(cur_x - in->x);
 			int h = WEIGHT * (abs(cur_x - destX) + abs(cur_y - destY));
 
-			if (open[cur_y][cur_x] < g + h) break;
-			open[cur_y][cur_x] = g + h;
+			if (openNode[cur_y][cur_x].f < g + h) break;
+			openNode[cur_y][cur_x].f = g + h;
 
-			*out = new Node;
+			*out = &openNode[cur_y][cur_x];
 			(*out)->x = cur_x;
 			(*out)->y = cur_y;
 			(*out)->left_corner = left_corner;
@@ -531,10 +477,10 @@ bool JumpPointSearch::CheckCornerU(Node* in, Node** out)
 			int g = in->g + cost[(int)DIR::UU] * abs(cur_y - in->y);
 			int h = WEIGHT * (abs(cur_x - destX) + abs(cur_y - destY));
 
-			if (open[cur_y][cur_x] < g + h) break;
-			open[cur_y][cur_x] = g + h;
+			if (openNode[cur_y][cur_x].f < g + h) break;
+			openNode[cur_y][cur_x].f = g + h;
 
-			*out = new Node;
+			*out = &openNode[cur_y][cur_x];
 			(*out)->x = cur_x;
 			(*out)->y = cur_y;
 			(*out)->left_corner = left_corner;
@@ -591,10 +537,10 @@ bool JumpPointSearch::CheckCornerD(Node* in, Node** out)
 			int g = in->g + cost[(int)DIR::DD] * abs(cur_y - in->y);
 			int h = WEIGHT * (abs(cur_x - destX) + abs(cur_y - destY));
 
-			if (open[cur_y][cur_x] < g + h) break;
-			open[cur_y][cur_x] = g + h;
+			if (openNode[cur_y][cur_x].f < g + h) break;
+			openNode[cur_y][cur_x].f = g + h;
 
-			*out = new Node;
+			*out = &openNode[cur_y][cur_x];
 			(*out)->x = cur_x;
 			(*out)->y = cur_y;
 			(*out)->left_corner = left_corner;
@@ -650,10 +596,10 @@ bool JumpPointSearch::CheckCornerUR(Node* in, Node** out)
 			int g = in->g + cost[(int)DIR::UR] * abs(cur_x - in->x);
 			int h = WEIGHT * (abs(cur_x - destX) + abs(cur_y - destY));
 
-			if (open[cur_y][cur_x] < g + h) break;
-			open[cur_y][cur_x] = g + h;
+			if (openNode[cur_y][cur_x].f < g + h) break;
+			openNode[cur_y][cur_x].f = g + h;
 
-			*out = new Node;
+			*out = &openNode[cur_y][cur_x];
 			(*out)->x = cur_x;
 			(*out)->y = cur_y;
 			(*out)->left_corner = left_corner;
@@ -711,10 +657,10 @@ bool JumpPointSearch::CheckCornerUL(Node* in, Node** out)
 			int g = in->g + cost[(int)DIR::UL] * abs(cur_x - in->x);
 			int h = WEIGHT * (abs(cur_x - destX) + abs(cur_y - destY));
 
-			if (open[cur_y][cur_x] < g + h) break;
-			open[cur_y][cur_x] = g + h;
+			if (openNode[cur_y][cur_x].f < g + h) break;
+			openNode[cur_y][cur_x].f = g + h;
 
-			*out = new Node;
+			*out = &openNode[cur_y][cur_x];
 			(*out)->x = cur_x;
 			(*out)->y = cur_y;
 			(*out)->left_corner = left_corner;
@@ -772,10 +718,10 @@ bool JumpPointSearch::CheckCornerDL(Node* in, Node** out)
 			int g = in->g + cost[(int)DIR::DL] * abs(cur_x - in->x);
 			int h = WEIGHT * (abs(cur_x - destX) + abs(cur_y - destY));
 
-			if (open[cur_y][cur_x] < g + h) break;
-			open[cur_y][cur_x] = g + h;
+			if (openNode[cur_y][cur_x].f < g + h) break;
+			openNode[cur_y][cur_x].f = g + h;
 
-			*out = new Node;
+			*out = &openNode[cur_y][cur_x];
 			(*out)->x = cur_x;
 			(*out)->y = cur_y;
 			(*out)->left_corner = left_corner;
@@ -833,10 +779,10 @@ bool JumpPointSearch::CheckCornerDR(Node* in, Node** out)
 			int g = in->g + cost[(int)DIR::DR] * abs(cur_x - in->x);
 			int h = WEIGHT * (abs(cur_x - destX) + abs(cur_y - destY));
 
-			if (open[cur_y][cur_x] < g + h) break;
-			open[cur_y][cur_x] = g + h;
+			if (openNode[cur_y][cur_x].f < g + h) break;
+			openNode[cur_y][cur_x].f = g + h;
 
-			*out = new Node;
+			*out = &openNode[cur_y][cur_x];
 			(*out)->x = cur_x;
 			(*out)->y = cur_y;
 			(*out)->left_corner = left_corner;
